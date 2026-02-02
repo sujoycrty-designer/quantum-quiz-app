@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Trophy, Timer, Mail, Zap, Globe, ShieldCheck } from 'lucide-react';
 import { Watermark } from './components/Watermark';
 
-const API = process.env.https://quantum-quiz-app.onrender.com ;|| 'http://localhost:5000';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 export default function App() {
     const [step, setStep] = useState('guide'); // guide, login, quiz, end, lead

@@ -1,1 +1,3 @@
-kk
+{
+  "routes": [{ "src": "/**", "dest": "/index.html" }]
+}

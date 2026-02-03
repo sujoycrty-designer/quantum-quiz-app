@@ -25,7 +25,7 @@ app.get('/api/leaderboard', async (req, res) => {
 });
 
 app.get('/api/cert', (req, res) => {
-    const { name, score, category, date } = req.query;
+    const { name, score, category} = req.query;
     const doc = new PDFDocument({ layout: 'landscape', size: 'A4' });
   
 
@@ -57,7 +57,7 @@ app.get('/api/cert', (req, res) => {
         // Signatures
     doc.moveTo(150, 480).lineTo(350, 480).lineWidth(1).stroke('#334155');
     doc.fillColor('#ffffff').fontSize(12).text('SUJOY CHAKRAVARTY', 150, 490, { width: 200, align: 'center' });    
-     doc.fillColor('#ffffff').fontSize(12).text(${date}, 495, 490, { width: 200, align: 'center' }); 
+    
     doc.moveTo(492, 480).lineTo(692, 480).lineWidth(1).stroke('#334155');
     doc.fillColor('#475569').text('Copyright @2026 Sujoy. All rights reserved.', 50, 510);
     doc.end();

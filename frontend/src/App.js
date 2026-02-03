@@ -1,52 +1,52 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Trophy, Timer, Mail, Zap, Globe, ShieldCheck } from 'lucide-react';
+import React, { useState } from 'react';
 import { Watermark } from './components/Watermark';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-
 export default function App() {
-    const [step, setStep] = useState('guide'); // guide, login, quiz, end, lead
-    const [score, setScore] = useState(0);
-    const [timeLeft, setTimeLeft] = useState(15);
-    const [user, setUser] = useState({ name: '', email: '' });
-
-    // Questions: Add your 45 questions here
-    const qList = [{ q: "What is Superposition?", a: ["One", "Both", "Zero"], c: 1 }];
-
-    useEffect(() => {
-        if (step === 'quiz' && timeLeft > 0) {
-            const t = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-            return () => clearTimeout(t);
-        } else if (timeLeft === 0 && step === 'quiz') handleNext(null);
-    }, [timeLeft, step]);
-
-    const handleNext = (i) => {
-        if (i === qList[0].c) setScore(s => s + 1 + (timeLeft/15));
-        setStep('end'); // Simplified for this example
-    };
+    // 1. Initialize State
+    const [step, setStep] = useState('welcome'); 
 
     return (
-        <div className="min-h-screen bg-[#020617] text-white flex flex-col items-center justify-center relative p-6">
+        <div className="min-h-screen bg-[#020617] text-white flex flex-col items-center justify-center">
             <Watermark />
-            
-            {step === 'guide' && (
-                <div className="bg-slate-900 border border-cyan-500/30 p-8 rounded-3xl max-w-md z-50 shadow-2xl">
-                    <h2 className="text-2xl font-black mb-6 text-cyan-400">SYSTEM PROTOCOL v1.0.4</h2>
-                    <div className="space-y-4 mb-8 text-sm text-slate-300">
-                        <p className="flex gap-2"><Zap size={16}/> Speed scoring active (15s per q).</p>
-                        <p className="flex gap-2"><ShieldCheck size={16}/> Certificate unlocks at 70%.</p>
-                    </div>
-                    <button onClick={() => setStep('login')} className="w-full bg-cyan-600 p-4 rounded-xl font-bold">ACCEPT & ENTER</button>
+
+            {/* STEP 1: WELCOME */}
+            {step === 'welcome' && (
+                <div className="text-center">
+                    <h1 className="text-4xl font-bold mb-6 text-cyan-400">QUANTUM PORTAL</h1>
+                    <button 
+                        onClick={() => setStep('login')} 
+                        className="bg-cyan-600 px-10 py-4 rounded-full font-black hover:bg-cyan-400 transition-all"
+                    >
+                        ACCEPT AND ENTER
+                    </button>
                 </div>
             )}
 
-            {/* Login, Quiz, End screens as per previous logic... */}
+            {/* STEP 2: LOGIN (This is what shows AFTER the click) */}
+            {step === 'login' && (
+                <div className="bg-slate-900 p-8 rounded-2xl border border-cyan-500/30">
+                    <h2 className="text-xl mb-4 text-center">Identity Verification</h2>
+                    <input 
+                        type="text" 
+                        placeholder="Enter Name" 
+                        className="w-full bg-slate-800 p-3 rounded mb-4 outline-none border border-slate-700 focus:border-cyan-500"
+                    />
+                    <button 
+                        onClick={() => setStep('quiz')} 
+                        className="w-full bg-cyan-600 p-3 rounded font-bold"
+                    >
+                        START ASSESSMENT
+                    </button>
+                </div>
+            )}
 
-            <footer className="absolute bottom-6 w-full flex justify-between px-10 text-[10px] text-slate-600 uppercase tracking-widest">
-                <span>©2026 Sujoy</span>
-                <a href="mailto:sumant.chakravarty@gmail.com" className="hover:text-cyan-400">sumant.chakravarty@gmail.com</a>
-            </footer>
+            {/* STEP 3: QUIZ (Fallback so it's never blank) */}
+            {step === 'quiz' && (
+                <div className="text-center">
+                    <h2 className="text-2xl font-bold">Quiz Loading...</h2>
+                    <p className="text-slate-400">Initializing Quantum Grids</p>
+                </div>
+            )}
         </div>
     );
 }

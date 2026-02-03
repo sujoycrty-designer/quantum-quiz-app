@@ -24,83 +24,68 @@ app.get('/api/leaderboard', async (req, res) => {
     res.json(top);
 });
 
-app.get('/api/cert', (req, res) => {
-    const { name, score, category } = req.query;
-    const doc = new PDFDocument({ 
-        layout: 'landscape', 
-        size: 'A4',
-        margin: 0 
-    });
+app.get('/api/cert', async (req, res) => {
+    try {
+        // 1. Extract and provide fallbacks for missing data
+        const name = req.query.name || "Quantum Candidate";
+        const score = req.query.score || "0";
+        const category = req.query.category || "Quantum AI Assessment"; // Fallback if not found
 
-    const certId = `QNT-${Math.random().toString(36).toUpperCase().substring(2, 10)}`;
-    const date = new Date().toLocaleDateString('en-US', { year: '2026', month: 'long', day: 'numeric' });
+        const doc = new PDFDocument({ 
+            layout: 'landscape', 
+            size: 'A4',
+            margin: 0 
+        });
 
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=${name}_Certificate.pdf`);
-    doc.pipe(res);
+        const certId = `QNT-${Math.random().toString(36).toUpperCase().substring(2, 10)}`;
+        const date = new Date().toLocaleDateString('en-US', { year: '2026', month: 'long', day: 'numeric' });
 
-    // 1. BACKGROUND & BORDER
-    doc.rect(0, 0, 842, 595).fill('#020617'); // Deep Midnight Background
-    
-    // Draw Cyan Outer Frame
-    doc.rect(20, 20, 802, 555).lineWidth(2).stroke('#0891b2');
-    // Draw Thin Inner Frame
-    doc.rect(35, 35, 772, 525).lineWidth(0.5).stroke('#164e63');
+        // 2. Set headers
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `inline; filename=Certificate_${name}.pdf`);
 
-    // 2. CORNER ACCENTS (Cyberpunk style)
-    const cornerSize = 40;
-    doc.lineWidth(4).strokeColor('#22d3ee');
-    // Top Left
-    doc.moveTo(20, 20 + cornerSize).lineTo(20, 20).lineTo(20 + cornerSize, 20).stroke();
-    // Bottom Right
-    doc.moveTo(822 - cornerSize, 575).lineTo(822, 575).lineTo(822, 575 - cornerSize).stroke();
+        doc.pipe(res);
 
-    // 3. HEADER
-    doc.fillColor('#22d3ee')
-       .fontSize(10)
-       .text('OFFICIAL QUANTUM ASSESSMENT PROTOCOL', 0, 80, { align: 'center', characterSpacing: 2 });
+        // --- DESIGN LAYER ---
+        doc.rect(0, 0, 842, 595).fill('#020617'); // Background
+        
+        // Borders
+        doc.rect(20, 20, 802, 555).lineWidth(2).stroke('#0891b2');
+        doc.rect(35, 35, 772, 525).lineWidth(0.5).stroke('#164e63');
 
-    doc.fillColor('#ffffff')
-       .fontSize(45)
-       .font('Helvetica-Bold')
-       .text('CERTIFICATE OF MASTERY', 0, 120, { align: 'center' });
+        // Header
+        doc.fillColor('#22d3ee').fontSize(10).text('OFFICIAL QUANTUM ASSESSMENT PROTOCOL', 0, 80, { align: 'center', characterSpacing: 2 });
+        doc.fillColor('#ffffff').fontSize(45).text('CERTIFICATE OF MASTERY', 0, 120, { align: 'center' });
 
-    // 4. MAIN CONTENT
-    doc.fillColor('#94a3b8')
-       .fontSize(16)
-       .font('Helvetica')
-       .text('This document serves as formal verification that', 0, 210, { align: 'center' });
+        // Content
+        doc.fillColor('#94a3b8').fontSize(16).text('This document serves as formal verification that', 0, 210, { align: 'center' });
+        doc.fillColor('#ffffff').fontSize(38).text(name.toUpperCase(), 0, 250, { align: 'center' });
 
-    doc.fillColor('#ffffff')
-       .fontSize(38)
-       .font('Times-Italic')
-       .text(name.toUpperCase(), 0, 250, { align: 'center' });
+        // CATEGORY SECTION (Safely handled)
+        doc.fillColor('#94a3b8').fontSize(16).text(`has successfully completed the`, 0, 310, { align: 'center' });
+        doc.fillColor('#ffffff').fontSize(18).text(category.toUpperCase(), 0, 335, { align: 'center' });
+        
+        doc.fillColor('#22d3ee').fontSize(24).text(`WITH A PROFICIENCY SCORE OF ${score}%`, 0, 370, { align: 'center' });
 
-    doc.fillColor('#94a3b8')
-       .fontSize(16)
-       .font('Helvetica')
-       .text(`has successfully completed the ${category} competency test`, 0, 310, { align: 'center' });
+        // Signatures
+        doc.moveTo(150, 480).lineTo(350, 480).lineWidth(1).stroke('#334155');
+        doc.fillColor('#ffffff').fontSize(12).text('SUJOY CHAKRAVARTY', 150, 490, { width: 200, align: 'center' });
+        
+        doc.moveTo(492, 480).lineTo(692, 480).lineWidth(1).stroke('#334155');
+        doc.fillColor('#ffffff').fontSize(12).text('DATE OF ISSUE', 492, 490, { width: 200, align: 'center' });
+        doc.fillColor('#64748b').fontSize(8).text(date, 492, 505, { width: 200, align: 'center' });
 
-    doc.fillColor('#22d3ee')
-       .fontSize(24)
-       .font('Helvetica-Bold')
-       .text(`WITH A PROFICIENCY SCORE OF ${score}%`, 0, 350, { align: 'center' });
+        // Metadata Footer
+        doc.fillColor('#164e63').fontSize(7).text(`VERIFICATION ID: ${certId} | PROTOCOL: v1.0.4-SECURE`, 40, 550);
 
-    // 5. FOOTER / SIGNATURES
-    doc.moveTo(150, 480).lineTo(350, 480).lineWidth(1).stroke('#334155');
-    doc.fillColor('#ffffff').fontSize(12).text('SUJOY CHAKRAVARTY', 150, 490, { width: 200, align: 'center' });
-    doc.fillColor('#64748b').fontSize(8).text('Lead Systems Architect', 150, 505, { width: 200, align: 'center' });
+        doc.end();
 
-    doc.moveTo(492, 480).lineTo(692, 480).lineWidth(1).stroke('#334155');
-    doc.fillColor('#ffffff').fontSize(12).text('DATE OF ISSUE', 492, 490, { width: 200, align: 'center' });
-    doc.fillColor('#64748b').fontSize(8).text(date, 492, 505, { width: 200, align: 'center' });
-
-    // 6. DIGITAL SEAL / ID
-    doc.fillColor('#164e63').fontSize(7)
-       .text(`VERIFICATION ID: ${certId}`, 40, 545);
-    doc.text('GEN-3 QUANTUM CLOUD COMPUTE ENGINE v1.0.4', 40, 555);
-
-    doc.end();
+    } catch (error) {
+        console.error("CRITICAL PDF ERROR:", error);
+        if (!res.headersSent) {
+            res.status(500).send("Internal Server Error: Certificate Generation Failed.");
+        }
+    }
 });
 
 const PORT = process.env.PORT || 5000;

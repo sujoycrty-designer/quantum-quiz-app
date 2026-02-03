@@ -27,6 +27,8 @@ app.get('/api/leaderboard', async (req, res) => {
 app.get('/api/cert', (req, res) => {
     const { name, score, category } = req.query;
     const doc = new PDFDocument({ layout: 'landscape', size: 'A4' });
+    const certId = `QNT-${Math.random().toString(36).toUpperCase().substring(2, 10)}`;
+    const date = new Date().toLocaleDateString('en-US', { year: '2026', month: 'long', day: 'numeric' });
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `inline; filename=Certificate_${name}.pdf`);
     doc.pipe(res);
@@ -35,8 +37,7 @@ app.get('/api/cert', (req, res) => {
     doc.fillColor('#ffffff').fontSize(25).text(`Awarded to: ${name}`, 0, 230, { align: 'center' });
     doc.fontSize(15).text(`Score: ${score}% | ${category}`, 0, 280, { align: 'center' });
     doc.fillColor('#475569').text('Copyright @2026 Sujoy. All rights reserved.', 50, 440);
-    const certId = `QNT-${Math.random().toString(36).toUpperCase().substring(2, 10)}`;
-    const date = new Date().toLocaleDateString('en-US', { year: '2026', month: 'long', day: 'numeric' });
+   
 
     doc.rect(0, 0, 842, 595).fill('#020617'); // Background
         

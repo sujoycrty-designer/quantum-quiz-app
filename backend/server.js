@@ -27,8 +27,7 @@ app.get('/api/leaderboard', async (req, res) => {
 app.get('/api/cert', (req, res) => {
     const { name, score, category } = req.query;
     const doc = new PDFDocument({ layout: 'landscape', size: 'A4' });
-    const certId = `QNT-${Math.random().toString(36).toUpperCase().substring(2, 10)}`;
-    const date = new Date().toLocaleDateString('en-US', { year: '2026', month: 'long', day: 'numeric' });
+  
 
         // 2. Set headers
     res.setHeader('Content-Type', 'application/pdf');
@@ -57,16 +56,9 @@ app.get('/api/cert', (req, res) => {
 
         // Signatures
     doc.moveTo(150, 480).lineTo(350, 480).lineWidth(1).stroke('#334155');
-    doc.fillColor('#ffffff').fontSize(12).text('SUJOY CHAKRAVARTY', 150, 490, { width: 200, align: 'center' });
-    doc.fillColor('#ffffff').fontSize(12).text('DATE OF ISSUE', 492, 490, { width: 200, align: 'center' });
-        
+    doc.fillColor('#ffffff').fontSize(12).text('SUJOY CHAKRAVARTY', 150, 490, { width: 200, align: 'center' });    
     doc.moveTo(492, 480).lineTo(692, 480).lineWidth(1).stroke('#334155');
-  
-  
     doc.fillColor('#475569').text('Copyright @2026 Sujoy. All rights reserved.', 50, 510);
-
-      
-    doc.fillColor('#164e63').fontSize(7).text(`VERIFICATION ID: ${certId} | PROTOCOL: v1.0.4-SECURE`, 40, 550);
     doc.end();
 });
 

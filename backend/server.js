@@ -27,8 +27,6 @@ app.get('/api/leaderboard', async (req, res) => {
 app.get('/api/cert', (req, res) => {
     const { name, score, category } = req.query;
     const doc = new PDFDocument({ layout: 'landscape', size: 'A4' });
-    
-    
     res.setHeader('Content-Type', 'application/pdf');
     
     doc.pipe(res);
